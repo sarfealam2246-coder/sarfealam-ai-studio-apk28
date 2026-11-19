@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - uses: actions/setup-java@v4
         with:
@@ -31,8 +31,14 @@ jobs:
           npm install --legacy-peer-deps
           npm run build
           npm install --legacy-peer-deps @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
-          npx cap init "Sarfealam Auto-Studio" "com.sarfealam.aistudio" --web-dir dist || true
-          npx cap add android || true
+          cat << 'EOF' > capacitor.config.json
+          {
+            "appId": "com.sarfealam.aistudio",
+            "appName": "Sarfealam Auto-Studio",
+            "webDir": "dist"
+          }
+          EOF
+          npx cap add android
           npx cap sync android
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           cd android && chmod +x gradlew && ./gradlew assembleDebug
@@ -49,3 +55,4 @@ jobs:
           files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
